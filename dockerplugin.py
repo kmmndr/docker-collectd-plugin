@@ -41,7 +41,7 @@ def _c(c):
     argument is a string, it is assumed to be the container's ID and only the
     first 7 digits will be returned. If it's a dictionary, the string returned
     is <7-digit ID>/<name>."""
-    if type(c) == str or type(c) == unicode:
+    if type(c) == str:
         return c[:7]
     return '{id}/{name}'.format(id=c['Id'][:7], name=c['Name'])
 
@@ -216,7 +216,7 @@ class ContainerStats(threading.Thread):
                                                      decode=True, stream=False)
                 # Reset failure count on successfull read from the stats API.
                 failures = 0
-            except Exception, e:
+            except Exception as e:
                 collectd.warning('Error reading stats from {container}: {msg}'
                                  .format(container=_c(self._container), msg=e))
 
@@ -334,7 +334,7 @@ class DockerPlugin:
                 t = stats['read']
                 for klass in self.CLASSES:
                     klass.read(container, stats, t)
-            except Exception, e:
+            except Exception as e:
                 collectd.warning(('Error getting stats for container '
                                   '{container}: {msg}')
                                  .format(container=_c(container), msg=e))
@@ -352,18 +352,18 @@ if __name__ == '__main__':
             identifier += '/' + self.type
             if getattr(self, 'type_instance', None):
                 identifier += '-' + self.type_instance
-            print 'PUTVAL', identifier, \
-                  ':'.join(map(str, [int(self.time)] + self.values))
+            print('PUTVAL', identifier, \
+                  ':'.join(map(str, [int(self.time)] + self.values)))
 
     class ExecCollectd:
         def Values(self):
             return ExecCollectdValues()
 
         def warning(self, msg):
-            print 'WARNING:', msg
+            print('WARNING:', msg)
 
         def info(self, msg):
-            print 'INFO:', msg
+            print('INFO:', msg)
 
         def register_read(self, docker_plugin):
             pass
